@@ -88,14 +88,14 @@ for i in range(num_bronze + num_silver + num_gold + 1, num_records + 1):
     customer_profiles.append([i] + generate_customer('Elite'))
 
 columns = [
-    'Customer ID', 'First Name', 'Last Name', 'Date of Birth', 'Gender', 'Email', 'Phone Number',
-    'Address', 'Province', 'Amphoe', 'Tambon', 'Zip Code', 'Country', 'Account Creation Date',
-    'Employment Status', 'Annual Income', 'Credit Score', 'Suitability Test Score', 'Marital Status',
-    'Number of Dependents', 'Marketing Consent - Email', 'Marketing Consent - SMS', 'Marketing Consent - LINE OA',
-    'Marketing Consent - Web/Mobile Push', 'Data Processing Consent', 'Product Holding Flag - Deposit',
-    'Product Holding Flag - Payment', 'Product Holding Flag - Investment', 'Product Holding Flag - Insurance',
-    'Asset Under Management - Deposit', 'Asset Under Management - Payment', 'Asset Under Management - Investment',
-    'Asset Under Management - Insurance', 'Total Asset Under Management', 'Customer Tier'
+    'customer_id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'phone_number',
+    'address', 'province', 'amphoe', 'tambon', 'zip_code', 'country', 'account_creation_date',
+    'employment_status', 'annual_income', 'credit_score', 'suitability_test_score', 'marital_status',
+    'number_of_dependents', 'marketing_consent_email', 'marketing_consent_sms', 'marketing_consent_line_oa',
+    'marketing_consent_web_mobile_push', 'data_processing_consent', 'product_holding_flag_deposit',
+    'product_holding_flag_payment', 'product_holding_flag_investment', 'product_holding_flag_insurance',
+    'asset_under_management_deposit', 'asset_under_management_payment', 'asset_under_management_investment',
+    'asset_under_management_insurance', 'total_asset_under_management', 'customer_tier'
 ]
 
 df_customer_profile = pd.DataFrame(customer_profiles, columns=columns)
