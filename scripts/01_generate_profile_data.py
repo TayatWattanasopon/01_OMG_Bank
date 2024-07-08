@@ -64,8 +64,7 @@ def generate_customer(tier):
     
     return [
         first_name, last_name, dob, gender, email, f"+661{random.randint(1000000, 9999999)}",
-        fake_th.street_address(), fake_th.province(), fake_th.amphoe(), fake_th.tambon(),
-        fake_th.postcode(), 'Thailand', account_creation_date,
+        fake_th.address(), 'Thailand', account_creation_date,
         random.choice(['Employed', 'Unemployed', 'Student', 'Retired']),
         annual_income, random.randint(300, 850), random.randint(1, 8),
         random.choice(['Single', 'Married', 'Divorced', 'Widowed']),
@@ -78,7 +77,7 @@ def generate_customer(tier):
 for i in range(1, num_bronze + 1):
     customer_profiles.append([i] + generate_customer('Bronze'))
 
-for i in range(num_bronze + 1, num_bronze + num_silver + 1):
+for i in range(num_bronze + 1, num_bronze + num_silver + num_silver + 1):
     customer_profiles.append([i] + generate_customer('Silver'))
 
 for i in range(num_bronze + num_silver + 1, num_bronze + num_silver + num_gold + 1):
@@ -89,13 +88,13 @@ for i in range(num_bronze + num_silver + num_gold + 1, num_records + 1):
 
 columns = [
     'customer_id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'phone_number',
-    'address', 'province', 'amphoe', 'tambon', 'zip_code', 'country', 'account_creation_date',
-    'employment_status', 'annual_income', 'credit_score', 'suitability_test_score', 'marital_status',
-    'number_of_dependents', 'marketing_consent_email', 'marketing_consent_sms', 'marketing_consent_line_oa',
-    'marketing_consent_web_mobile_push', 'data_processing_consent', 'product_holding_flag_deposit',
-    'product_holding_flag_payment', 'product_holding_flag_investment', 'product_holding_flag_insurance',
-    'asset_under_management_deposit', 'asset_under_management_payment', 'asset_under_management_investment',
-    'asset_under_management_insurance', 'total_asset_under_management', 'customer_tier'
+    'address', 'country', 'account_creation_date', 'employment_status', 'annual_income', 'credit_score',
+    'suitability_test_score', 'marital_status', 'number_of_dependents', 'marketing_consent_email',
+    'marketing_consent_sms', 'marketing_consent_line_oa', 'marketing_consent_web_mobile_push',
+    'data_processing_consent', 'product_holding_flag_deposit', 'product_holding_flag_payment',
+    'product_holding_flag_investment', 'product_holding_flag_insurance', 'asset_under_management_deposit',
+    'asset_under_management_payment', 'asset_under_management_investment', 'asset_under_management_insurance',
+    'total_asset_under_management', 'customer_tier'
 ]
 
 df_customer_profile = pd.DataFrame(customer_profiles, columns=columns)
