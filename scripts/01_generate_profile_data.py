@@ -3,9 +3,10 @@ import pandas as pd
 import faker
 import random
 from datetime import datetime, timedelta
+import pytz
 
 # Configurable number of records
-num_records = 100
+num_records = 10000
 
 # Distribution of customer tiers
 bronze_pct = 0.60
@@ -14,7 +15,7 @@ gold_pct = 0.15
 elite_pct = 0.05
 
 num_bronze = int(num_records * bronze_pct)
-num_silver = int(num_records * silver_pct)
+num_silver = int(num_records * bronze_pct)
 num_gold = int(num_records * gold_pct)
 num_elite = int(num_records * elite_pct)
 
@@ -26,9 +27,12 @@ num_bronze += remaining
 fake_en = faker.Faker('en_TH')
 fake_th = faker.Faker('th_TH')
 
+# Timezone for Bangkok
+bkk_tz = pytz.timezone('Asia/Bangkok')
+
 customer_profiles = []
 
-def generate_customer(tier):
+def generate_customer(tier, customer_id):
     gender = random.choice(['Male', 'Female', 'Other'])
     if gender == 'Male':
         first_name = fake_en.first_name_male()
@@ -40,18 +44,8 @@ def generate_customer(tier):
     last_name = fake_en.last_name()
     email = f"{first_name.lower()}.{last_name.lower()}@example.com"
     dob = fake_en.date_of_birth()
-    account_creation_date = fake_en.date_between(start_date='-10y', end_date='today')
-    annual_income = random.randint(100000, 1000000)
-    
-    product_holding_deposit = random.choice([True, False])
-    product_holding_payment = random.choice([True, False])
-    product_holding_investment = random.choice([True, False])
-    product_holding_insurance = random.choice([True, False])
-    
-    asset_deposit = random.randint(0, 500000) if product_holding_deposit else 0
-    asset_payment = random.randint(0, 500000) if product_holding_payment else 0
-    asset_investment = random.randint(0, 500000) if product_holding_investment else 0
-    asset_insurance = random.randint(0, 500000) if product_holding_insurance else 0
+    account_creation_date = fake_en.date_between(start_date='-1y', end_date='today')
+    annual_income = random.randint(500000, 10000000)
     
     if tier == 'Bronze':
         total_aum = random.randint(0, 500000)
@@ -59,32 +53,58 @@ def generate_customer(tier):
         total_aum = random.randint(500001, 2000000)
     elif tier == 'Gold':
         total_aum = random.randint(2000001, 10000000)
-    else: # Elite
+    else:  # Elite
         total_aum = random.randint(10000001, 20000000)
     
+    product_holdings = ['deposit', 'payment', 'investment', 'insurance']
+    random.shuffle(product_holdings)
+    
+    asset_allocation = {}
+    remaining_aum = total_aum
+    
+    for product in product_holdings:
+        if remaining_aum <= 0:
+            asset_allocation[product] = 0
+        elif product == product_holdings[-1]:
+            asset_allocation[product] = remaining_aum
+        else:
+            allocation = random.randint(0, remaining_aum)
+            asset_allocation[product] = allocation
+            remaining_aum -= allocation
+    
+    product_holding_flags = {product: (asset_allocation[product] > 0) for product in product_holdings}
+    
+    dob_iso = bkk_tz.localize(datetime(dob.year, dob.month, dob.day, 0, 0, 0)).isoformat()
+    account_creation_date_iso = bkk_tz.localize(datetime(account_creation_date.year, account_creation_date.month, account_creation_date.day, 0, 0, 0)).isoformat()
+    
     return [
-        first_name, last_name, dob, gender, email, f"+661{random.randint(1000000, 9999999)}",
-        fake_th.address(), 'Thailand', account_creation_date,
+        customer_id, first_name, last_name, dob_iso, gender, email, f"+661{random.randint(1000000, 9999999)}",
+        fake_th.address(), 'Thailand', account_creation_date_iso,
         random.choice(['Employed', 'Unemployed', 'Student', 'Retired']),
         annual_income, random.randint(300, 850), random.randint(1, 8),
         random.choice(['Single', 'Married', 'Divorced', 'Widowed']),
         random.randint(0, 5), random.choice([True, False]), random.choice([True, False]),
         random.choice([True, False]), random.choice([True, False]), random.choice([True, False]),
-        product_holding_deposit, product_holding_payment, product_holding_investment, product_holding_insurance,
-        asset_deposit, asset_payment, asset_investment, asset_insurance, total_aum, tier
+        product_holding_flags['deposit'], product_holding_flags['payment'], product_holding_flags['investment'], product_holding_flags['insurance'],
+        asset_allocation['deposit'], asset_allocation['payment'], asset_allocation['investment'], asset_allocation['insurance'],
+        total_aum, tier
     ]
 
 for i in range(1, num_bronze + 1):
-    customer_profiles.append([i] + generate_customer('Bronze'))
+    customer_id = f"CUST-A{str(i).zfill(6)}"
+    customer_profiles.append(generate_customer('Bronze', customer_id))
 
-for i in range(num_bronze + 1, num_bronze + num_silver + num_silver + 1):
-    customer_profiles.append([i] + generate_customer('Silver'))
+for i in range(num_bronze + 1, num_bronze + num_silver + 1):
+    customer_id = f"CUST-A{str(i).zfill(6)}"
+    customer_profiles.append(generate_customer('Silver', customer_id))
 
 for i in range(num_bronze + num_silver + 1, num_bronze + num_silver + num_gold + 1):
-    customer_profiles.append([i] + generate_customer('Gold'))
+    customer_id = f"CUST-A{str(i).zfill(6)}"
+    customer_profiles.append(generate_customer('Gold', customer_id))
 
 for i in range(num_bronze + num_silver + num_gold + 1, num_records + 1):
-    customer_profiles.append([i] + generate_customer('Elite'))
+    customer_id = f"CUST-A{str(i).zfill(6)}"
+    customer_profiles.append(generate_customer('Elite', customer_id))
 
 columns = [
     'customer_id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'phone_number',
