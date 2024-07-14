@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import faker
 import random
-from datetime import datetime, timedelta
+from datetime import datetime
 import pytz
 import uuid
 
@@ -16,7 +16,7 @@ gold_pct = 0.15
 elite_pct = 0.05
 
 num_bronze = int(num_records * bronze_pct)
-num_silver = int(num_records * silver_pct)
+num_silver = int(num_records * bronze_pct)
 num_gold = int(num_records * gold_pct)
 num_elite = int(num_records * elite_pct)
 
@@ -52,13 +52,13 @@ def generate_customer(tier, customer_id):
     
     signup_source = random.choice(['Web', 'iOS', 'Android'])
     
-    annoymous_id = str(uuid.uuid4())
+    anonymous_id = str(uuid.uuid4())
 
     return [
-        customer_id,annoymous_id, first_name, last_name, dob_iso, gender, email, f"+661{random.randint(1000000, 9999999)}",
+        customer_id, anonymous_id, first_name, last_name, dob_iso, gender, email, f"+661{random.randint(1000000, 9999999)}",
         fake_th.address(), 'Thailand', account_creation_date_iso,
         random.choice([True, False]), random.choice([True, False]),
-        random.choice([True, False]), random.choice([True, False]), random.choice([True, False]),signup_source,
+        random.choice([True, False]), random.choice([True, False]), random.choice([True, False]), signup_source,
         tier
     ]
 
@@ -79,10 +79,10 @@ for i in range(num_bronze + num_silver + num_gold + 1, num_records + 1):
     customer_profiles.append(generate_customer('Elite', customer_id))
 
 columns = [
-    'user_id','annoymous_id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'phone_number',
-    'address', 'country', 'account_creation_date','marketing_consent_email',
+    'user_id', 'anonymous_id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'phone_number',
+    'address', 'country', 'account_creation_date', 'marketing_consent_email',
     'marketing_consent_sms', 'marketing_consent_line_oa', 'marketing_consent_web_mobile_push',
-    'data_processing_consent','signup_source','customer_tier'
+    'data_processing_consent', 'signup_source', 'customer_tier'
 ]
 
 df_customer_profile = pd.DataFrame(customer_profiles, columns=columns)
@@ -94,6 +94,10 @@ os.makedirs(output_dir, exist_ok=True)
 # Save the dataframe to a CSV file
 csv_path = os.path.join(output_dir, 'customer_profile_ecomm.csv')
 df_customer_profile.to_csv(csv_path, index=False)
+
+# Save the dataframe to a JSON file
+json_path = os.path.join(output_dir, 'customer_profile_ecomm.json')
+df_customer_profile.to_json(json_path, orient='records', lines=True)
 
 # Display the first 10 records
 df_first_10_customers = df_customer_profile.head(10)
