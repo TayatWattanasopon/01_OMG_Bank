@@ -15,7 +15,7 @@ gold_pct = 0.15
 elite_pct = 0.05
 
 num_bronze = int(num_records * bronze_pct)
-num_silver = int(num_records * bronze_pct)
+num_silver = int(num_records * silver_pct)
 num_gold = int(num_records * gold_pct)
 num_elite = int(num_records * elite_pct)
 
@@ -72,7 +72,7 @@ def generate_customer(tier, customer_id):
             asset_allocation[product] = allocation
             remaining_aum -= allocation
     
-    product_holding_flags = {product: (asset_allocation[product] > 0) for product in product_holdings}
+    product_holding_flags = {product: (random.random() >= 0.2) for product in product_holdings}  # 20% chance of being False
     
     dob_iso = bkk_tz.localize(datetime(dob.year, dob.month, dob.day, 0, 0, 0)).isoformat()
     account_creation_date_iso = bkk_tz.localize(datetime(account_creation_date.year, account_creation_date.month, account_creation_date.day, 0, 0, 0)).isoformat()
@@ -108,10 +108,8 @@ for i in range(num_bronze + num_silver + num_gold + 1, num_records + 1):
     customer_id = f"CUST-A{str(i).zfill(6)}"
     customer_profiles.append(generate_customer('Elite', customer_id))
 
-
-
 columns = [
-    'user_id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'phone_number',
+    'customer_id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'phone_number',
     'address', 'country', 'account_creation_date', 'employment_status', 'annual_income', 'credit_score',
     'suitability_test_score', 'marital_status', 'marketing_consent_email',
     'marketing_consent_sms', 'marketing_consent_line_oa', 'marketing_consent_web_mobile_push',
