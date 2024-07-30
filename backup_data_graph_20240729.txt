@@ -1,0 +1,71 @@
+# Note that the below is simply a skeleton Data Graph and is not intended to be used as-is.
+data_graph {
+  version = "v1.0.0"
+
+  entity "wishlist-entity" {
+    name        = "wishlist"
+    table_ref   = "TECH_SAUCE_DEMO.SNEAKER_RETAILER_DEMO.WISH_LIST"
+    primary_key = "ID"
+    // For Linked Events - optional and defaults to false
+    enrichment_enabled = false
+  }
+
+  entity "products-entity" {
+    name        = "products"
+    table_ref   = "TECH_SAUCE_DEMO.SNEAKER_RETAILER_DEMO.PRODUCTS"
+    primary_key = "ID"
+  }
+
+  entity "orders-entity" {
+    name        = "orders"
+    table_ref   = "TECH_SAUCE_DEMO.SNEAKER_RETAILER_DEMO.ORDERS"
+    primary_key = "ORDER_ID"
+    // For Linked Events - optional and defaults to false
+    enrichment_enabled = false
+  }
+
+  entity "orders-products-entity" {
+    name        = "orders products"
+    table_ref   = "TECH_SAUCE_DEMO.SNEAKER_RETAILER_DEMO.ORDER_PRODUCT"
+    primary_key = "ID"
+  }
+  profile {
+    type           = "segment:unmaterialized"
+    profile_folder = "TECH_SAUCE_DEMO.SNEAKER_RETAILER_DEMO"
+
+    relationship "wishlist-relationship" {
+      name           = "Wishlist Relationship"
+      related_entity = "wishlist-entity"
+      external_id {
+        type     = "user_id"
+        join_key = "USER_ID"
+      }
+
+      relationship "products-wl-relationship" {
+        name           = "Products Relationship"
+        related_entity = "products-entity"
+        join_on        = "wishlist-entity.PRODUCT_ID = products-entity.ID"
+      }
+    }
+    relationship "orders-relationship" {
+      name           = "Orders Relationship"
+      related_entity = "orders-entity"
+      external_id {
+        type     = "user_id"
+        join_key = "USER_ID"
+      }
+
+      relationship "orders-products-relationship" {
+        name           = "Orders Products Relationship"
+        related_entity = "orders-products-entity"
+        join_on        = "orders-entity.ORDER_ID = orders-products-entity.ORDER_ID"
+
+        relationship "products-o-relationship" {
+          name           = "Products Relationship"
+          related_entity = "products-entity"
+          join_on        = "orders-products-entity.PRODUCT_ID = products-entity.ID"
+        }
+      }
+    }
+  }
+}

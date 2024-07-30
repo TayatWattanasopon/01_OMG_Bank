@@ -1,0 +1,36 @@
+# Note that the below is simply a skeleton Data Graph and is not intended to be used as-is.
+data_graph {
+  version = "v1.0.0"
+
+  entity "pos-orders-entity" {
+    name        = "pos-orders"
+    table_ref   = "TECH_SAUCE_DEMO.SNEAKER_RETAILER_DEMO.POS_ORDERS"
+    primary_key = "ORDER_ID"
+  }
+
+  entity "loyalty-txn-entity" {
+    name        = "loyalty-txn"
+    table_ref   = "TECH_SAUCE_DEMO.SNEAKER_RETAILER_DEMO.LOYALTY_TXN"
+    primary_key = "LOY_TXN_ID"
+  }
+
+  profile {
+    type           = "segment:unmaterialized"
+    profile_folder = "TECH_SAUCE_DEMO.SNEAKER_RETAILER_DEMO"
+
+    relationship "pos-orders-relationship" {
+      name           = "POS Orders Relationship"
+      related_entity = "pos-orders-entity"
+      external_id {
+        type     = "user_id"
+        join_key = "USER_ID"
+      }
+
+      relationship "pos-orders-loy-relationship" {
+        name           = "POS Loy Relationship"
+        related_entity = "loyalty-txn-entity"
+        join_on        = "pos-orders-entity.ORDER_ID = loyalty-txn-entity.POS_ORDER_ID"
+      }
+    }
+  }
+}
